@@ -1,7 +1,18 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git config *)",
+      "Bash(start \"\" \"C:\\\\Program Files\\\\Git\\\\git-bash.exe\" --cd=\"c:/Users/袁锦聪/Desktop/在线购物网站\")",
+      "Bash(ls -la ~/.ssh/ 2>/dev/null || echo \"~/.ssh 目录不存在\")",
+      "Read(//c/Users/袁锦聪/**)",
+      "Bash(mkdir -p ~/.ssh)",
+      "Bash(chmod 700 ~/.ssh)",
+      "Bash(ssh-keygen -t ed25519 -C \"2932639748@qq.com\" -f ~/.ssh/id_ed25519 -N \"\")",
+      "Bash(cat ~/.ssh/id_ed25519.pub)",
+      "Read(//c/Users/袁锦聪/.ssh/**)",
+      "Bash(ssh -o StrictHostKeyChecking=accept-new -T git@github.com)"
     ]
   }
 }
