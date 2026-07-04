@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>锦聪的小店</title>
+    <link rel="stylesheet" href="Jincong.css">
+</head>
+<body>
+    <div id="app">
+        <!-- ===== 页面头部：Logo、导航菜单、搜索框、用户状态 ===== -->
+        <header class="site-header">
+            <div class="brand-block">
+                <p class="eyebrow">Campus Select Shop</p>
+                <h1>锦聪的小店</h1>
+                <p class="brand-copy">闲置、校园与线上好物集中展示，支持搜索、购物车和账号切换。</p>
+            </div>
+
+            <button class="menu-toggle" type="button" @click="menuOpen = !menuOpen">
+                {{ menuOpen ? '关闭菜单' : '打开菜单' }}
+            </button>
+
+            <div class="header-panel" :class="{ open: menuOpen }">
+                <nav class="main-nav">
+                    <a href="#personal" @click="menuOpen = false">个人闲置</a>
+                    <a href="#campus" @click="menuOpen = false">校内商品</a>
+                    <a href="#online" @click="menuOpen = false">线上精选</a>
+                    <a href="#cart" @click="menuOpen = false">购物车 {{ cartCount }}</a>
+                </nav>
+
+                <div class="search-box">
+                    <input
+                        v-model.trim="searchKeyword"
+                        type="text"
+                        placeholder="搜索商品、描述或分类"
+                        @keyup.enter="menuOpen = false"
+                    >
+                </div>
+
+                <div class="user-info">
+                    <div>
+                        <p class="user-label">当前状态</p>
+                        <strong>{{ currentUser ? currentUser.username : '未登录' }}</strong>
+                    </div>
+                    <button class="auth-btn" type="button" @click="handleAuthAction">
+                        {{ currentUser ? '退出登录' : '登录 / 注册' }}
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== 主内容区：商品列表 + 购物车侧栏 ===== -->
+        <main class="page-shell">
+            <section class="hero-card">
+                <div>
+                    <p class="eyebrow">Responsive Vue 3 Experience</p>
+                    <h2>更清晰的视觉层次，更灵活的移动端排版</h2>
+                    <p>
+                        商品列表由 Vue 3 响应式渲染驱动，搜索结果会实时更新，桌面端和手机端都能保持稳定布局。
+                    </p>
+                </div>
+                <!-- 统计面板：在售商品数、购物车件数、当前搜索结果数 -->
+                <div class="hero-stats">
+                    <article>
+                        <strong>{{ products.length }}</strong>
+                        <span>在售商品</span>
+                    </article>
+                    <article>
+                        <strong>{{ cartCount }}</strong>
+                        <span>购物车件数</span>
+                    </article>
+                    <article>
+                        <strong>{{ filteredProducts.length }}</strong>
+                        <span>当前结果</span>
+                    </article>
+                </div>
+            </section>
+
+            <!-- 搜索状态提示：用户输入关键词后显示匹配结果数 -->
+            <div class="content-grid">
+                <div class="catalogue">
+                    <section v-if="searchKeyword" class="search-state">
+                        <h2>搜索结果</h2>
+                        <p>
+                            关键词“{{ searchKeyword }}”匹配到 {{ filteredProducts.length }} 件商品。
+                        </p>
+                    </section>
+
+                    <!-- 商品分类区：由 Vue 循环渲染三个分类（个人闲置/校内商品/线上精选） -->
+                    <section
+                        v-for="section in categorySections"
+                        :key="section.id"
+                        :id="section.id"
+                        class="product-category"
+                    >
+                        <div class="section-heading">
+                            <div>
+                                <p class="eyebrow">{{ section.en }}</p>
+                                <h2>{{ section.title }}</h2>
+                            </div>
+                            <span class="section-count">{{ productsByCategory(section.id).length }} 件</span>
+                        </div>
+
+                        <div v-if="productsByCategory(section.id).length" class="products">
+                            <article v-for="product in productsByCategory(section.id)" :key="product.id" class="product-card">
+                                <div class="product-media">
+                                    <img :src="product.image" :alt="product.name" class="product-img">
+                                    <span class="category-tag">{{ section.short }}</span>
+                                </div>
+                                <div class="product-info">
+                                    <h3>{{ product.name }}</h3>
+                                    <p class="description">{{ product.description }}</p>
+                                    <div class="meta-row">
+                                        <span class="price">¥{{ product.price.toFixed(2) }}</span>
+                                        <span class="shipping">运费 ¥{{ product.shipping.toFixed(2) }}</span>
+                                    </div>
+                                    <button
+                                        class="add-to-cart"
+                                        type="button"
+                                        :disabled="!currentUser"
+                                        @click="addToCart(product.id)"
+                                    >
+                                        {{ currentUser ? '加入购物车' : '请先登录' }}
+                                    </button>
+                                </div>
+                            </article>
+                        </div>
+
+                        <div v-else class="empty-state">
+                            当前分类下没有匹配的商品。
+                        </div>
+                    </section>
+                </div>
+
+                <!-- ===== 购物车侧栏 ===== -->
+                <aside id="cart" class="cart-section">
+                    <div class="section-heading">
+                        <div>
+                            <p class="eyebrow">Shopping Cart</p>
+                            <h2>购物车</h2>
+                        </div>
+                        <span class="section-count">{{ cartCount }} 件</span>
+                    </div>
+
+                    <div v-if="cartDetails.length" id="cart-items">
+                        <article v-for="item in cartDetails" :key="item.id" class="cart-item">
+                            <div class="cart-copy">
+                                <strong>{{ item.name }}</strong>
+                                <p>单价 ¥{{ item.price.toFixed(2) }} + 运费 ¥{{ item.shipping.toFixed(2) }}</p>
+                            </div>
+                            <div class="cart-actions">
+                                <div class="quantity-box">
+                                    <button type="button" @click="decreaseQuantity(item.id)">-</button>
+                                    <span>{{ item.quantity }}</span>
+                                    <button type="button" @click="increaseQuantity(item.id)">+</button>
+                                </div>
+                                <button class="remove-btn" type="button" @click="removeFromCart(item.id)">移除</button>
+                            </div>
+                        </article>
+                    </div>
+                    <div v-else class="empty-state">购物车还是空的，先挑几件商品。</div>
+
+                    <div class="cart-summary">
+                        <p>商品总数 <strong>{{ cartCount }}</strong></p>
+                        <p>订单总计 <strong>¥{{ cartTotal.toFixed(2) }}</strong></p>
+                    </div>
+
+                    <button class="checkout-btn" type="button" :disabled="!currentUser || !cartCount" @click="checkout">
+                        {{ currentUser ? '提交订单' : '登录后结算' }}
+                    </button>
+                </aside>
+            </div>
+        </main>
+
+        <!-- ===== 浮动操作按钮 ===== -->
+        <div class="floating-actions">
+            <button type="button" @click="feedbackModalOpen = true">用户反馈</button>
+        </div>
+
+        <!-- ===== 登录/注册弹窗 ===== -->
+        <div v-if="authModalOpen" class="modal" @click.self="authModalOpen = false">
+            <div class="modal-content">
+                <div class="auth-tabs">
+                    <button type="button" class="tab-btn" :class="{ active: authMode === 'login' }" @click="authMode = 'login'">
+                        登录
+                    </button>
+                    <button type="button" class="tab-btn" :class="{ active: authMode === 'register' }" @click="authMode = 'register'">
+                        注册
+                    </button>
+                </div>
+
+                <div v-if="authMode === 'login'">
+                    <h3>用户登录</h3>
+                    <form @submit.prevent="login">
+                        <input v-model.trim="loginForm.username" type="text" placeholder="用户名" required>
+                        <input v-model="loginForm.password" type="password" placeholder="密码" required>
+                        <button type="submit">登录</button>
+                    </form>
+                    <p class="default-creds">默认账号(注意：只能一次登录)：demo，密码：5123210102006</p>
+                </div>
+
+                <div v-else>
+                    <h3>创建账号</h3>
+                    <form @submit.prevent="register">
+                        <input v-model.trim="registerForm.username" type="text" placeholder="用户名" required>
+                        <input v-model.trim="registerForm.email" type="email" placeholder="邮箱" required>
+                        <input v-model="registerForm.password" type="password" placeholder="密码" required>
+                        <input v-model="registerForm.confirmPassword" type="password" placeholder="确认密码" required>
+                        <button type="submit">注册并登录</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 用户反馈弹窗 ===== -->
+        <div v-if="feedbackModalOpen" class="modal" @click.self="feedbackModalOpen = false">
+            <div class="modal-content">
+                <h3>用户反馈</h3>
+                <form @submit.prevent="submitFeedback">
+                    <input v-model.trim="feedbackForm.name" type="text" placeholder="姓名" required>
+                    <input v-model.trim="feedbackForm.email" type="email" placeholder="邮箱" required>
+                    <textarea v-model.trim="feedbackForm.message" placeholder="请写下你的建议或问题" required></textarea>
+                    <button type="submit">提交反馈</button>
+                </form>
+            </div>
+        </div>
+
+        <footer class="site-footer">
+            <p>© 2026 锦聪的小店. 基于 Vue 3 渐进增强渲染。</p>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="Jincong.js"></script>
+</body>
+</html>

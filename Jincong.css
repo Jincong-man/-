@@ -1,0 +1,698 @@
+/* ============================================================
+   CSS 变量（设计令牌 Design Tokens）
+   ============================================================
+   把所有颜色、阴影、圆角等可复用的值定义为变量，
+   放在 :root 中全局可用。
+   好处：改一个变量，所有引用的地方自动更新，不用逐个查找替换。
+   ============================================================ */
+:root {
+    --bg: #f5efe4;
+    --bg-soft: #fbf7f0;
+    --surface: rgba(255, 252, 246, 0.88);
+    --surface-strong: #fffdf8;
+    --text: #1f2430;
+    --muted: #666b76;
+    --line: rgba(31, 36, 48, 0.08);
+    --primary: #146c63;
+    --primary-dark: #0d4d47;
+    --accent: #d96c3d;
+    --accent-soft: #f4d9c9;
+    --success: #2f8f5b;
+    --shadow: 0 18px 45px rgba(65, 45, 20, 0.12);
+    --radius-xl: 28px;
+    --radius-lg: 20px;
+    --radius-md: 14px;
+    --max-width: 1320px;
+}
+
+/* ============================================================
+   全局重置（CSS Reset）
+   消除浏览器默认样式差异，建立一致的起点。
+   ============================================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    line-height: 1.6;
+    color: var(--text);
+    background:
+        radial-gradient(circle at top left, rgba(217, 108, 61, 0.15), transparent 28%),
+        radial-gradient(circle at right 20%, rgba(20, 108, 99, 0.14), transparent 26%),
+        linear-gradient(180deg, #f7f1e8 0%, #f4ede1 100%);
+    min-height: 100vh;
+}
+
+/* ============================================================
+   基础元素统一样式
+   ============================================================ */
+img {
+    display: block;
+    max-width: 100%;
+}
+
+button,
+input,
+textarea {
+    font: inherit;
+}
+
+button {
+    border: none;
+    cursor: pointer;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+#app {
+    min-height: 100vh;
+}
+
+/* ============================================================
+   顶部导航栏（sticky 吸顶定位）
+   滚动时固定在页面顶部，始终可见。
+   - 桌面端：Logo + 导航横排显示
+   - 移动端：菜单可折叠（通过 .menu-toggle 按钮切换）
+   ============================================================ */
+.site-header {
+    width: min(calc(100% - 24px), var(--max-width));
+    margin: 10px auto 0;
+    padding: 14px 18px;
+    display: grid;
+    gap: 14px;
+    border: 1px solid rgba(34, 120, 62, 0.6);
+    border-radius: var(--radius-xl);
+    background: rgba(19, 126, 172, 0.86);
+    backdrop-filter: blur(18px);
+    color: #f8f6f1;
+    box-shadow: var(--shadow);
+}
+
+.brand-block h1 {
+    font-size: clamp(1.7rem, 3vw, 2.9rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+}
+
+.brand-copy {
+    max-width: 36rem;
+    margin-top: 4px;
+    font-size: 0.98rem;
+    color: rgba(248, 246, 241, 0.8);
+}
+
+.eyebrow {
+    margin-bottom: 4px;
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent-soft);
+}
+
+.menu-toggle {
+    justify-self: start;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+}
+
+.header-panel {
+    display: none;
+    gap: 14px;
+}
+
+.header-panel.open {
+    display: grid;
+}
+
+.main-nav {
+    display: grid;
+    gap: 10px;
+}
+
+.main-nav a {
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.08);
+    transition: transform 0.25s ease, background-color 0.25s ease;
+}
+
+.main-nav a:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.search-box input,
+.modal-content input,
+.modal-content textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface-strong);
+    color: var(--text);
+    outline: none;
+}
+
+.search-box input {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.search-box input::placeholder {
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.user-info {
+    display: grid;
+    gap: 10px;
+    align-items: center;
+}
+
+.user-label {
+    font-size: 0.78rem;
+    color: rgba(248, 246, 241, 0.7);
+}
+
+/* ============================================================
+   通用按钮样式（多处复用）
+   登录按钮、加入购物车、提交订单、弹窗提交、反馈按钮
+   都使用这个统一样式。
+   ============================================================ */
+.auth-btn,
+.add-to-cart,
+.checkout-btn,
+.modal-content form button,
+.floating-actions button {
+    padding: 12px 18px;
+    border-radius: 14px;
+    color: #fff;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 14px 24px rgba(20, 108, 99, 0.2);
+}
+
+.auth-btn:hover,
+.add-to-cart:hover,
+.checkout-btn:hover,
+.modal-content form button:hover,
+.floating-actions button:hover {
+    transform: translateY(-1px);
+}
+
+.auth-btn:disabled,
+.add-to-cart:disabled,
+.checkout-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* ============================================================
+   页面主体区域
+   ============================================================ */
+.page-shell {
+    width: min(calc(100% - 24px), var(--max-width));
+    margin: 24px auto 0;
+    padding-bottom: 90px;
+}
+
+/* ============================================================
+   Hero 横幅区 — 页面顶部概览
+   ============================================================ */
+.hero-card,
+.product-category,
+.cart-section,
+.search-state {
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    background: var(--surface);
+    backdrop-filter: blur(16px);
+    box-shadow: var(--shadow);
+}
+
+.hero-card {
+    display: grid;
+    gap: 24px;
+    padding: 24px;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+}
+
+.hero-card h2 {
+    font-size: clamp(1.8rem, 3.8vw, 3rem);
+    line-height: 1.1;
+    margin-bottom: 12px;
+}
+
+.hero-card p {
+    color: var(--muted);
+    max-width: 48rem;
+}
+
+.hero-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 14px;
+}
+
+.hero-stats article {
+    padding: 18px;
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.74);
+    border: 1px solid var(--line);
+}
+
+.hero-stats strong {
+    display: block;
+    font-size: 1.8rem;
+    color: var(--primary-dark);
+}
+
+.hero-stats span {
+    color: var(--muted);
+}
+
+/* ============================================================
+   商品目录区（分类 + 卡片网格）
+   使用 CSS Grid 自动布局：列数根据屏幕宽度自动调整
+   （repeat(auto-fit, minmax(220px, 1fr)) 的含义：
+   每列最小 220px 宽，空间够就排更多列）
+   ============================================================ */
+.content-grid {
+    display: grid;
+    gap: 22px;
+    margin-top: 22px;
+}
+
+.catalogue {
+    display: grid;
+    gap: 22px;
+}
+
+.search-state,
+.product-category,
+.cart-section {
+    padding: 22px;
+    border-radius: var(--radius-xl);
+}
+
+.section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.section-heading h2 {
+    font-size: clamp(1.4rem, 2vw, 2rem);
+    line-height: 1.15;
+}
+
+.section-count {
+    flex-shrink: 0;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.products {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+}
+
+/* ============================================================
+   商品卡片
+   Hover 时卡片上浮 4px，增加阴影，增强可点击感知。
+   ============================================================ */
+.product-card {
+    display: grid;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.82);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 34px rgba(31, 36, 48, 0.1);
+}
+
+.product-media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(20, 108, 99, 0.12), rgba(217, 108, 61, 0.12));
+}
+
+.product-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.category-tag {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    padding: 7px 11px;
+    border-radius: 999px;
+    background: rgba(255, 253, 248, 0.85);
+    color: var(--primary-dark);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.product-info {
+    display: grid;
+    gap: 12px;
+    padding: 18px;
+}
+
+.product-info h3 {
+    font-size: 1.2rem;
+    line-height: 1.2;
+}
+
+.description {
+    color: var(--muted);
+    min-height: 3.2em;
+}
+
+.meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.price {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.shipping {
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+
+/* ============================================================
+   购物车侧栏
+   - 桌面端：sticky 粘在顶部下方，随滚动保持可见
+   - 移动端：跟随文档流
+   ============================================================ */
+.cart-section {
+    position: relative;
+    align-self: start;
+}
+
+#cart-items {
+    display: grid;
+    gap: 14px;
+}
+
+.cart-item {
+    display: grid;
+    gap: 14px;
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.76);
+}
+
+.cart-copy p,
+.cart-summary p,
+.search-state p,
+.empty-state {
+    color: var(--muted);
+}
+
+.cart-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.quantity-box {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.quantity-box button {
+    width: 38px;
+    height: 38px;
+    background: transparent;
+    color: var(--text);
+}
+
+.quantity-box span {
+    min-width: 34px;
+    text-align: center;
+    font-weight: 700;
+}
+
+.remove-btn {
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: rgba(217, 108, 61, 0.12);
+    color: var(--accent);
+}
+
+.cart-summary {
+    display: grid;
+    gap: 8px;
+    margin: 20px 0;
+    padding: 18px;
+    border-radius: 18px;
+    background: rgba(20, 108, 99, 0.08);
+}
+
+.empty-state {
+    padding: 18px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.65);
+    border: 1px dashed rgba(31, 36, 48, 0.14);
+}
+
+/* ============================================================
+   浮动操作按钮（固定在右下角）
+   ============================================================ */
+.floating-actions {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 90;
+}
+
+/* ============================================================
+   弹窗（登录/注册、用户反馈）
+   - 半透明遮罩层 + backdrop-filter 毛玻璃效果
+   - 居中显示白色内容卡片
+   - 点击遮罩层可关闭弹窗
+   ============================================================ */
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    background: rgba(19, 24, 31, 0.52);
+    backdrop-filter: blur(8px);
+}
+
+.modal-content {
+    width: min(100%, 520px);
+    padding: 26px;
+    border-radius: var(--radius-xl);
+    background: var(--bg-soft);
+    box-shadow: 0 24px 46px rgba(21, 19, 16, 0.2);
+}
+
+.modal-content h3 {
+    margin-bottom: 18px;
+    font-size: 1.5rem;
+}
+
+.modal-content form {
+    display: grid;
+    gap: 14px;
+}
+
+.modal-content textarea {
+    min-height: 140px;
+    resize: vertical;
+}
+
+.auth-tabs {
+    display: inline-grid;
+    grid-template-columns: repeat(2, 1fr);
+    width: 100%;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.tab-btn {
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgba(20, 108, 99, 0.08);
+    color: var(--primary-dark);
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff;
+}
+
+.default-creds {
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 0.92rem;
+}
+
+/* ============================================================
+   页脚
+   ============================================================ */
+.site-footer {
+    width: min(calc(100% - 24px), var(--max-width));
+    margin: 0 auto 20px;
+    padding: 12px 4px 4px;
+    color: var(--muted);
+    text-align: center;
+}
+
+/* ============================================================
+   响应式布局（Responsive Layout）
+   使用媒体查询（Media Query）为不同屏幕尺寸提供不同布局。
+
+   什么是媒体查询？
+   @media 是 CSS 用来检测设备特性的规则。比如检测屏幕宽度、
+   设备类型等。这里用 min-width 和 max-width 区分三档屏幕：
+   - 手机（< 640px）    : 最后一段覆盖
+   - 平板（640-1039px） : 默认样式 + 第一段（≥760px）
+   - 桌面（≥1040px）    : 三列并排布局
+   ============================================================ */
+/* ----- 平板及以上（≥760px）----- */
+@media (min-width: 760px) {
+    .site-header {
+        grid-template-columns: minmax(320px, 1.08fr) minmax(450px, 0.92fr);
+        align-items: center;
+    }
+
+    .menu-toggle {
+        display: none;
+    }
+
+    .header-panel,
+    .header-panel.open {
+        display: grid;
+    }
+
+    .main-nav {
+        grid-template-columns: repeat(4, auto);
+        justify-content: start;
+        gap: 8px;
+    }
+
+    .user-info {
+        grid-template-columns: 1fr auto;
+        align-items: center;
+    }
+
+    .hero-card {
+        grid-template-columns: 1.4fr 1fr;
+        align-items: center;
+    }
+}
+
+/* ----- 桌面端（≥1040px）：三列布局 ----- */
+@media (min-width: 1040px) {
+    .brand-block {
+        padding-right: 18px;
+    }
+
+    .header-panel {
+        align-content: center;
+    }
+
+    .content-grid {
+        grid-template-columns: minmax(0, 1.7fr) minmax(320px, 0.9fr);
+        align-items: start;
+    }
+
+    .cart-section {
+        position: sticky;
+        top: 138px;
+    }
+}
+
+/* ----- 小屏手机（≤640px）：间距收缩 + 按钮全宽 ----- */
+@media (max-width: 640px) {
+    .site-header,
+    .page-shell,
+    .site-footer {
+        width: min(calc(100% - 16px), var(--max-width));
+    }
+
+    .site-header,
+    .hero-card,
+    .search-state,
+    .product-category,
+    .cart-section,
+    .modal-content {
+        padding: 18px;
+    }
+
+    .brand-copy {
+        font-size: 0.94rem;
+    }
+
+    .section-heading {
+        align-items: start;
+        flex-direction: column;
+    }
+
+    .cart-actions {
+        align-items: stretch;
+    }
+
+    .remove-btn {
+        width: 100%;
+    }
+
+    .floating-actions {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+    }
+
+    .floating-actions button,
+    .checkout-btn {
+        width: 100%;
+    }
+}
