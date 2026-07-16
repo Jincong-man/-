@@ -196,7 +196,7 @@
                         <input v-model="loginForm.password" type="password" placeholder="密码" required>
                         <button type="submit">登录</button>
                     </form>
-                    <p class="default-creds">默认账号(注意：只能一次登录)：demo，密码：5123210102006</p>
+                    <p class="default-creds">默认账号：demo，密码：demo123456</p>
                 </div>
 
                 <div v-else>
@@ -215,7 +215,7 @@
         <!-- ===== 用户反馈弹窗 ===== -->
         <div v-if="feedbackModalOpen" class="modal" @click.self="feedbackModalOpen = false">
             <div class="modal-content">
-                <h3>用户反馈</h3>
+                <h3>用户反馈</h3>=
                 <form @submit.prevent="submitFeedback">
                     <input v-model.trim="feedbackForm.name" type="text" placeholder="姓名" required>
                     <input v-model.trim="feedbackForm.email" type="email" placeholder="邮箱" required>

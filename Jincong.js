@@ -249,6 +249,7 @@ createApp({
                 // 在商品列表中查找匹配的商品信息
                 const product = this.products.find((entry) => entry.id === item.id);
                 // 如果商品已从商品列表中删除，返回 null（下面用 filter(Boolean) 过滤掉）
+                if (!product) return null;
                 return {
                     ...product,
                     quantity: item.quantity
